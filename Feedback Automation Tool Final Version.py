@@ -94,7 +94,6 @@ with st.sidebar:
     lob_choice = st.selectbox("🏷️ Select LOB", ["Select", "Tech Certs", "SEPO", "OC,DD,BC", "All"], index=0)
     downloads_path = Path.home() / "Downloads"
     out_folder_input = st.text_input("💾 Output folder path", str(downloads_path))
-    open_after = st.checkbox("📂 Open folder after generation", True)
     generate_btn = st.button("🚀 Generate Reports")
 
 # ------------------ Summary Dashboard (Top Row) ------------------
@@ -309,80 +308,88 @@ if uploaded and generate_btn:
                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
     # Open Folder
-    try:
-        if open_after:
-            os.startfile(base_outroot)
-    except Exception:
-        st.warning("⚠️ Unable to open folder automatically. Please check permissions.")
-
     st.success(f"✅ Feedback Reports Generated Successfully for {lob_choice}")
     # ------------------------
-# Create ZIPs by LOB and Session Date
-# ------------------------
-# ------------------------
-# Create ZIPs by LOB and Session Date (Refined)
-# ------------------------
-# ------------------------
-# Create ZIPs by LOB and Session Date (Refined, Safe)
-# ------------------------
-import shutil, time
 
-if "log_entries" in locals() and log_entries:
-    try:
-        session_folders = [f for f in base_outroot.iterdir() if f.is_dir() and f.name.startswith("Feedback Reports for")]
-        if not session_folders:
-            st.info("No session folders found yet. Generate reports first.")
-        else:
-            for session_folder in session_folders:
-                lob_folders = [f for f in session_folder.iterdir() if f.is_dir()]
+# ------------------------------------------
+# 📦 ZIP DOWNLOAD SECTION (Refined Logic)
+# ------------------------------------------
+with st.expander("📦 Download Feedback Reports"):
+    import shutil, time
 
-                # 🔹 Case 1: "All LOB" selected → one master ZIP
-                if lob_choice.upper() == "ALL":
-                    zip_name = f"Feedback_Reports_All_LOBs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
-                    zip_path = base_outroot / zip_name
-                    shutil.make_archive(str(zip_path).replace(".zip", ""), "zip", session_folder)
+    if log_entries:  # ensure reports were generated
+        try:
+            # Identify all session folders created during generation
+            session_folders = [
+                f for f in base_outroot.iterdir()
+                if f.is_dir() and f.name.startswith("Feedback Reports for")
+            ]
 
-                    with open(zip_path, "rb") as zip_file:
-                        zip_bytes = zip_file.read()
+            if not session_folders:
+                st.warning("No generated session folders found.")
+            else:
+                for session_folder in session_folders:
+                    lob_folders = [f for f in session_folder.iterdir() if f.is_dir()]
 
-                    with st.expander("📦 Download All LOB Reports (ZIP)"):
+                    # 🔹 Case 1 — All LOBs Selected
+                    if lob_choice.upper() == "ALL":
+                        zip_name = f"Feedback_Reports_All_LOBs_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+                        zip_path = base_outroot / zip_name
+                        shutil.make_archive(str(zip_path).replace(".zip", ""), "zip", session_folder)
+
+                        with open(zip_path, "rb") as zip_file:
+                            zip_bytes = zip_file.read()
+
                         st.download_button(
-                            label="⬇️ Download All Feedback Reports",
+                            label="⬇️ Download All LOB Reports (ZIP)",
                             data=zip_bytes,
                             file_name=zip_name,
-                            mime="application/zip"
+                            mime="application/zip",
+                            key="all_lobs_zip"
                         )
-                    st.success("✅ Master ZIP for All LOBs ready for download")
+                        st.caption(f"🕒 Generated at {datetime.now().strftime('%d-%b-%Y %H:%M:%S')}")
+                        st.success("✅ Master ZIP for All LOBs ready for download")
 
-                    time.sleep(2)
-                    zip_path.unlink(missing_ok=True)
+                        time.sleep(2)
+                        zip_path.unlink(missing_ok=True)
 
-                # 🔹 Case 2: Single LOB selected → individual ZIPs
-                else:
-                    with st.expander("📦 Download Individual LOB Reports"):
+                    # 🔹 Case 2 — Specific LOB Selected
+                    else:
+                        selected_lob = lob_choice.upper()
+                        found = False
                         for lob_folder in lob_folders:
-                            zip_name = f"Feedback_Reports_{lob_folder.name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
-                            zip_path = base_outroot / zip_name
-                            shutil.make_archive(str(zip_path).replace(".zip", ""), "zip", lob_folder)
+                            if lob_folder.name.upper() == selected_lob:
+                                found = True
+                                zip_name = f"Feedback_Reports_{lob_folder.name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+                                zip_path = base_outroot / zip_name
 
-                            with open(zip_path, "rb") as zip_file:
-                                zip_bytes = zip_file.read()
+                                shutil.make_archive(str(zip_path).replace(".zip", ""), "zip", lob_folder)
+                                with open(zip_path, "rb") as zip_file:
+                                    zip_bytes = zip_file.read()
 
-                            st.download_button(
-                                label=f"⬇️ {lob_folder.name} Reports",
-                                data=zip_bytes,
-                                file_name=zip_name,
-                                mime="application/zip"
-                            )
-                            st.success(f"✅ ZIP ready for {lob_folder.name}")
+                                st.download_button(
+                                    label=f"⬇️ Download {lob_folder.name} Reports (ZIP)",
+                                    data=zip_bytes,
+                                    file_name=zip_name,
+                                    mime="application/zip",
+                                    key=f"{lob_folder.name}_zip"
+                                )
+                                st.caption(f"🕒 Generated at {datetime.now().strftime('%d-%b-%Y %H:%M:%S')}")
+                                st.success(f"✅ ZIP ready for {lob_folder.name}")
 
-                            time.sleep(2)
-                            zip_path.unlink(missing_ok=True)
-    except Exception as e:
-        st.error(f"Error while creating ZIP files: {e}")
-else:
-    st.info("ℹ️ Generate reports first to enable ZIP downloads.")
+                                time.sleep(2)
+                                zip_path.unlink(missing_ok=True)
+                                break
 
+                        if not found:
+                            st.warning(f"No reports found for selected LOB: {lob_choice}")
+        except Exception as e:
+            st.error(f"Error while creating ZIP files: {e}")
+    else:
+        st.info("ℹ️ Generate reports first to enable ZIP downloads.")
+
+# ------------------------------------------
+# Footer
 # ------------------ Footer ------------------
 st.markdown("""
 <hr>
