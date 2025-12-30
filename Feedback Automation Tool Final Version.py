@@ -457,8 +457,8 @@ if uploaded and generate_btn:
 
         except Exception as e:
         st.error(f"Shared folder upload failed: {e}")
-
-    log_entries.append({
+    
+        log_entries.append({
             "S.No": i,
             "Course": course,
             "PL": pl,
@@ -581,5 +581,6 @@ st.markdown("""
 Version 1.1.4 | © 2025 All Rights Reserved
 </div>
 """, unsafe_allow_html=True)
+
 
 
