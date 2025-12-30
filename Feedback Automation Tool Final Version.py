@@ -444,7 +444,7 @@ if uploaded and generate_btn:
         try:
             session_month = get_month_year_folder(date_str)
 
-            shared_month_dir = Path(SHARED_ROOT) / session_month
+            shared_month_dir = Path(shared_root) / session_month
             shared_date_dir  = shared_month_dir / (date_str or "Unknown Date")
             shared_lob_dir   = shared_date_dir / lob
 
@@ -456,7 +456,7 @@ if uploaded and generate_btn:
                 dst.write(src.read())
 
         except Exception as e:
-            st.warning(f"⚠️ Could not copy report to shared folder: {e}")
+            st.error(f"Shared folder upload failed: {e}")
 
     log_entries.append({
             "S.No": i,
@@ -581,3 +581,4 @@ st.markdown("""
 Version 1.1.4 | © 2025 All Rights Reserved
 </div>
 """, unsafe_allow_html=True)
+
