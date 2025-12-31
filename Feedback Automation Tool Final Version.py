@@ -235,7 +235,10 @@ with st.sidebar:
     value="C:\\Users\\MohammedShakeelMulla\\OneDrive - Erulearning Solutions Pvt Ltd\\Feedback Automation Tool Reports"
     )
     shared_root = Path(shared_root_input).expanduser()
-  
+    if not shared_root.exists():
+    st.error(f"❌ Shared folder does not exist: {shared_root}")
+else:
+    st.info(f"📂 Using shared folder: {shared_root}") 
     generate_btn = st.button("🚀 Generate Reports")
 
 # ------------------ Summary Dashboard (Enhanced) ------------------
@@ -588,3 +591,4 @@ st.markdown("""
 Version 1.1.4 | © 2025 All Rights Reserved
 </div>
 """, unsafe_allow_html=True)
+
