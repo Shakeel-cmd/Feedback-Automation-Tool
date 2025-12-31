@@ -587,8 +587,9 @@ with st.expander("📦 Download Feedback Reports"):
 st.markdown("""
 <hr>
 <div style='text-align:center; background-color:#2B2B2B; color:white; padding:12px; border-radius:5px;'>
-<b>Developed by EMERITUS</b><br>
+<b>Developed by EMERITUS - Tech Certs(INDIA APAC)</b><br>
 Version 1.1.4 | © 2025 All Rights Reserved
 </div>
 """, unsafe_allow_html=True)
+
 
