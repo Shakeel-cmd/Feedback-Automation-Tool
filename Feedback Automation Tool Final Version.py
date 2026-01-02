@@ -203,34 +203,50 @@ st.markdown(
 
 # ------------------ Sidebar ------------------
 with st.sidebar:
+
     st.image(str(LOGO_PATH), width=220)
     st.markdown("<h2 style='color:white;'>⚙️ Work-Flow</h2>", unsafe_allow_html=True)
-    uploaded = st.file_uploader("📁 Upload Excel workbook (Automation sheet)", type=["xlsx"])
-    # 🟢 Upload Instructions (Styled Note)
-    st.markdown("""
-<div style="
-    background-color:#2B2B2B;
-    color:white;
-    padding:12px;
-    border-radius:8px;
-    border:1px solid #00B050;
-    font-size:14px;
-    line-height:1.5;
-">
-<b>⚠️ Important Upload Instructions:</b><br>
-• Please upload <b>only one Automation Excel file</b> per generation.<br>
-• After downloading your reports or ZIP, click <b>Refresh (Ctrl + R)</b> before uploading another file.<br>
-• This ensures clean processing and prevents duplicate reports in ZIP files.<br><br>
-🟩 <i>Tip:</i> Keep your Excel file clean — no blank rows or extra spaces in columns.
-</div>
-""", unsafe_allow_html=True)
+
+    # ---------------- TEMPLATE DOWNLOAD ----------------
+    template_path = Path(__file__).parent / "Automation Template.xlsx"
+
+    st.markdown("### 📥 Download Automation Template")
+
+    if template_path.exists():
+        with open(template_path, "rb") as tfile:
+            st.download_button(
+                label="⬇️ Download Excel Template",
+                data=tfile,
+                file_name="Feedback_Automation Template.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                key="template_download_btn"
+            )
+    else:
+        st.warning("Template file not found — please add 'Automation Template.xlsx' to the app folder.")
 
 
-    lob_choice = st.selectbox("🏷️ Select LOB", ["Select", "Tech Certs", "SEPO", "OC,DD,BC", "All"], index=0)
+    # ---------------- FILE UPLOAD ----------------
+    uploaded = st.file_uploader(
+        "📁 Upload Automation Excel Sheet",
+        type=["xlsx"]
+    )
+
+    # ---------------- LOB SELECTION ----------------
+    lob_choice = st.selectbox(
+        "🏷️ Select LOB",
+        ["Select", "Tech Certs", "SEPO", "OC,DD,BC", "All"],
+        index=0
+    )
+
+    # ---------------- OUTPUT PATH ----------------
     downloads_path = Path.home() / "Downloads"
-    out_folder_input = st.text_input("💾 Output folder path", str(downloads_path))
-    generate_btn = st.button("🚀 Generate Reports")
+    out_folder_input = st.text_input(
+        "💾 Output folder path",
+        str(downloads_path)
+    )
 
+    # ---------------- GENERATE BUTTON ----------------
+    generate_btn = st.button("🚀 Generate Reports")
 # ------------------ Summary Dashboard (Enhanced) ------------------
 st.markdown("<h3 style='color:white; text-align:center;'>📊 Summary Dashboard</h3>", unsafe_allow_html=True)
 
@@ -567,3 +583,4 @@ st.markdown("""
 Version 1.1.4 | © 2025 All Rights Reserved
 </div>
 """, unsafe_allow_html=True)
+
