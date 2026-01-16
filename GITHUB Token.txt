@@ -1,0 +1,16 @@
+cd "C:\Users\MohammedShakeelMulla\Downloads\My Automation\Feedback Automation\Feedback Automation"
+git init
+git add .
+git commit -m "Initial commit - Feedback Automation Tool"
+git branch -M main
+git remote add origin https://github.com/<your-username>/feedback-automation-tool.git
+git push -u origin main
+
+
+git config --global user.name "Shakeel-cmd"
+git config --global user.email "mohammed.shakeel@emeritus.org"
+
+
+git remote add origin https://github.com/Shakeel-cmd/Feedback-Automation-Tool.git
+
+GitHub personal token classic - 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
