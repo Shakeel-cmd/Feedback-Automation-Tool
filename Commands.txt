@@ -1,0 +1,17 @@
+CMD
+
+pip install streamlit pandas openpyxl
+
+streamlit run app.py
+
+
+VS
+
+streamlit run "C:\Users\MohammedShakeelMulla\Downloads\My Automation\Feedback Automation\Feedback Automation\Feedback Automation Tool Final Version.py"
+
+streamlit run "C:\Users\MohammedShakeelMulla\Downloads\My Automation\Feedback Automation\Feedback Automation\Testing.py"
+
+C:\Users\MohammedShakeelMulla\Downloads\My Automation\Feedback Automation\Feedback Automation\Logo.ico
+
+Hariharan.v@Emeritus.org
+mohammed.shakeel@emeritus.org

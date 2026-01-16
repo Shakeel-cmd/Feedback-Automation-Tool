@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+
+# Streamlit / temp files
+*.xlsx
+*.zip
+temp_automation.xlsx
+
+# Secrets
+.env
+
+# System / build folders
+.devcontainer/
+appx/
+bin/
+locales/
+policies/
+resources/
+tools/
+GITHUB Token*.txt
