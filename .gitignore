@@ -18,3 +18,15 @@ locales/
 policies/
 resources/
 tools/
+GITHUB Token*.txt
+# Claude Code local settings
+.claude/
+
+# Generated output files
+output/
+
+# Old backup files
+Backup.py
+
+# Accidental files
+et --soft --rootgit reset --soft --root
