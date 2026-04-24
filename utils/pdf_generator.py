@@ -21,6 +21,7 @@ Public API:
 """
 
 import os
+import platform
 from collections import Counter, defaultdict
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
@@ -29,19 +30,43 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus.flowables import Flowable
 
+
 # ── Font registration ──────────────────────────────────────────
-_FONT_PATHS = {
-    'Sans':    'C:/Windows/Fonts/arial.ttf',
-    'Sans-B':  'C:/Windows/Fonts/arialbd.ttf',
-    'Serif-B': 'C:/Windows/Fonts/timesbd.ttf',
-    'Mono':    'C:/Windows/Fonts/cour.ttf',
-}
-for _name, _path in _FONT_PATHS.items():
-    if os.path.exists(_path):
-        pdfmetrics.registerFont(TTFont(_name, _path))
+def _register_fonts():
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+
+    if platform.system() == "Windows":
+        font_paths = {
+            'Sans':    'C:/Windows/Fonts/arial.ttf',
+            'Sans-B':  'C:/Windows/Fonts/arialbd.ttf',
+            'Serif-B': 'C:/Windows/Fonts/timesbd.ttf',
+            'Mono':    'C:/Windows/Fonts/cour.ttf',
+        }
+    else:
+        font_paths = {
+            'Sans':    '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+            'Sans-B':  '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+            'Serif-B': '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf',
+            'Mono':    '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf',
+        }
+
+    registered = []
+    for name, path in font_paths.items():
+        try:
+            if os.path.exists(path):
+                pdfmetrics.registerFont(TTFont(name, path))
+                registered.append(name)
+            else:
+                print(f'⚠️ Font not found: {path} — using Helvetica fallback')
+        except Exception as e:
+            print(f'⚠️ Font registration failed for {name}: {e}')
+
+    print(f'✅ Fonts registered: {registered}')
+
+_register_fonts()
 
 # ── Colours ────────────────────────────────────────────────────
 GREEN      = colors.HexColor("#00B050")

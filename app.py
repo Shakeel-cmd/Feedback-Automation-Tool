@@ -24,7 +24,14 @@ from config.settings import (
 from utils.report_generator import generate_report, clean_text, fmt_date
 from utils.zip_handler import create_zip_from_folder, create_lob_zip
 from utils.airtable import upload_to_airtable
-from utils.pdf_generator import generate_pdf
+try:
+    from utils.pdf_generator import generate_pdf
+    print('✅ pdf_generator imported successfully')
+except Exception as e:
+    import traceback
+    print(f'❌ pdf_generator import failed: {e}')
+    print(traceback.format_exc())
+    generate_pdf = None
 from utils.sentiment import analyse_from_excel_rows
 
 os.makedirs(EXCEL_OUTPUT_DIR, exist_ok=True)
@@ -322,29 +329,36 @@ if uploaded and generate_btn:
 
             st.write(f"📄 Generating PDF for **{lob}**...")
             pdf_path = None
-            try:
-                pdf_sentiments = analyse_from_excel_rows(rows_for_pdf)
-                topic_val = grp["Topic"].dropna()
-                session_title = topic_val.iloc[0] if len(topic_val) > 0 else course
-                avg_score = round(sum(group_ratings) / len(group_ratings), 2) if group_ratings else 0.0
-                pdf_path = generate_pdf({
-                    "run_code": course,
-                    "title": session_title,
-                    "date": date_str,
-                    "pl_name": pl,
-                    "lob": lob,
-                    "rows": rows_for_pdf,
-                    "avg_score": avg_score,
-                    "sentiments": pdf_sentiments,
-                    "output_dir": str(pdf_out_folder),
-                    "filename": xlsx_stem,
-                })
-                pdf_count += 1
-                print(f"📄 PDF generated at: {pdf_path}")
-                print(f"📄 PDF exists on disk: {os.path.exists(pdf_path)}")
-                print(f"📄 PDF size: {os.path.getsize(pdf_path) if os.path.exists(pdf_path) else 'FILE NOT FOUND'}")
-            except Exception as pdf_err:
-                st.write(f"⚠️ PDF skipped for {lob}: {pdf_err}")
+            if generate_pdf is None:
+                print('⚠️ PDF skipped — pdf_generator failed to import')
+            else:
+                try:
+                    pdf_sentiments = analyse_from_excel_rows(rows_for_pdf)
+                    topic_val = grp["Topic"].dropna()
+                    session_title = topic_val.iloc[0] if len(topic_val) > 0 else course
+                    avg_score = round(sum(group_ratings) / len(group_ratings), 2) if group_ratings else 0.0
+                    pdf_path = generate_pdf({
+                        "run_code": course,
+                        "title": session_title,
+                        "date": date_str,
+                        "pl_name": pl,
+                        "lob": lob,
+                        "rows": rows_for_pdf,
+                        "avg_score": avg_score,
+                        "sentiments": pdf_sentiments,
+                        "output_dir": str(pdf_out_folder),
+                        "filename": xlsx_stem,
+                    })
+                    pdf_count += 1
+                    print(f"📄 PDF generated at: {pdf_path}")
+                    print(f"📄 PDF exists on disk: {os.path.exists(pdf_path)}")
+                    print(f"📄 PDF size: {os.path.getsize(pdf_path) if os.path.exists(pdf_path) else 'FILE NOT FOUND'}")
+                except Exception as e:
+                    import traceback
+                    print(f'❌ PDF generation failed: {e}')
+                    print(traceback.format_exc())
+                    st.write(f"⚠️ PDF skipped for {lob}: {e}")
+                    pdf_path = None
 
             # Track per-LOB results
             if lob not in lob_results:
