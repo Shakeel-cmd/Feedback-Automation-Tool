@@ -1,4 +1,5 @@
 # All hardcoded configuration values for Feedback Automation Tool
+import tempfile, os
 
 LOB_OPTIONS = ["Select", "Tech Certs", "SEPO", "OC,DD,BC", "All"]
 
@@ -29,9 +30,9 @@ FOOTER_TEXT = "Developed by EMERITUS — Feedback Automation Tool"
 COL_WIDTHS = {"A": 18.86, "B": 42.86, "C": 42.57, "D": 47.86}
 ZOOM_SCALE = 90
 
-# Output directories (relative to app working directory)
-EXCEL_OUTPUT_DIR = "output/excel"
-PDF_OUTPUT_DIR   = "output/pdf"
+# Output directories — use system temp so they are writable on Streamlit Cloud
+EXCEL_OUTPUT_DIR = os.path.join(tempfile.gettempdir(), "feedback_output", "excel")
+PDF_OUTPUT_DIR   = os.path.join(tempfile.gettempdir(), "feedback_output", "pdf")
 
 # Airtable
 AIRTABLE_BASE_ID = "app7HKMKVF1SlHn9e"
