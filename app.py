@@ -1,7 +1,12 @@
+import os
 from dotenv import load_dotenv
 load_dotenv()
 
-import os
+api_key = os.environ.get("ANTHROPIC_API_KEY")
+if api_key:
+    print(f"✅ ANTHROPIC_API_KEY loaded — ends with ...{api_key[-6:]}")
+else:
+    print("⚠️ ANTHROPIC_API_KEY not found — running rules-only mode")
 import streamlit as st
 import pandas as pd
 from pathlib import Path
@@ -335,6 +340,9 @@ if uploaded and generate_btn:
                     "filename": xlsx_stem,
                 })
                 pdf_count += 1
+                print(f"📄 PDF generated at: {pdf_path}")
+                print(f"📄 PDF exists on disk: {os.path.exists(pdf_path)}")
+                print(f"📄 PDF size: {os.path.getsize(pdf_path) if os.path.exists(pdf_path) else 'FILE NOT FOUND'}")
             except Exception as pdf_err:
                 st.write(f"⚠️ PDF skipped for {lob}: {pdf_err}")
 
