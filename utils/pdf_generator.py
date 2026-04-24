@@ -429,8 +429,10 @@ def generate_pdf(data_dict: dict) -> str:
     st_kpi_sub = S('ks', fontName='Sans',   fontSize=8, textColor=MUTED, leading=11)
 
     top_theme_name = top3[0][0] if top3 else "N/A"
+    top_theme_words = top_theme_name.split()
     if len(top_theme_name) > 18:
-        top_theme_name = top_theme_name[:16] + "…"
+        mid = len(top_theme_words) // 2
+        top_theme_name = " ".join(top_theme_words[:mid]) + "\n" + " ".join(top_theme_words[mid:])
 
     kpi_cells = [
         (CARD_BG, GREEN,  "RESPONSES",      str(total),          "Learners participated"),
@@ -441,10 +443,11 @@ def generate_pdf(data_dict: dict) -> str:
 
     kpi_row_data = []
     for bg, accent, lbl, val, sub in kpi_cells:
+        val_fs = 13 if lbl == "TOP THEME" else 17
         val_para = Paragraph(
             val.replace("\n", "<br/>"),
-            S('kv', fontName='Sans-B', fontSize=17, textColor=TEXT,
-              leading=20, alignment=TA_LEFT)
+            S('kv', fontName='Sans-B', fontSize=val_fs, textColor=TEXT,
+              leading=val_fs + 3, alignment=TA_LEFT)
         )
         inner = Table(
             [[Paragraph(lbl, st_kpi_lbl)], [val_para], [Paragraph(sub, st_kpi_sub)]],
@@ -577,8 +580,8 @@ def generate_pdf(data_dict: dict) -> str:
     story.append(SectionHeading("Individual Responses", USABLE))
     story.append(sp(6))
 
-    CW = [USABLE * p for p in [0.05, 0.32, 0.07, 0.13, 0.43]]
-    st_th = S('th', fontName='Sans-B', fontSize=7,  textColor=TBL_ACC)
+    CW = [USABLE * p for p in [0.05, 0.29, 0.10, 0.13, 0.43]]
+    st_th = S('th', fontName='Sans-B', fontSize=7,  textColor=TBL_ACC, wordWrap='LTR')
     st_td = S('td', fontName='Sans',   fontSize=8,  textColor=TEXT,   leading=11)
     st_tr = S('tr', fontName='Sans-B', fontSize=8,  textColor=RED_TX, leading=11)
     st_tm = S('tm', fontName='Sans',   fontSize=8,  textColor=MUTED,  leading=11)
@@ -613,7 +616,7 @@ def generate_pdf(data_dict: dict) -> str:
                               textColor=GREEN, alignment=TA_RIGHT, leading=12)),
     ])
 
-    rh = [20] + [None] * len(rows) + [26]
+    rh = [24] + [None] * len(rows) + [26]
     row_bgs = [('BACKGROUND', (0, i), (-1, i), ROW_ALT if i % 2 == 0 else CARD)
                for i in range(1, len(rows) + 1)]
 
